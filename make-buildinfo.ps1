@@ -21,19 +21,20 @@ function Read-Props($path) {
     return $map
 }
 
-# Garantiza que $path sea una carpeta de salida válida, y devuelve la ruta en $pfallback que finalmente se va a usar
-function Confirm-dir($path, $fallback) {
+# Garantiza que $path sea una carpeta de salida válida; devuelve la ruta usada
+function Confirm-Dir($path, $fallback) {
     if ([string]::IsNullOrWhiteSpace($path)) { $path = $fallback }
-    try { 
+    try {
         New-Item -ItemType Directory -Force -Path $path | Out-Null
         return $path
     }
-    catch { 
+    catch {
         Write-Warning "Ruta de salida inválida '$path'. Usando '$fallback'."
         New-Item -ItemType Directory -Force -Path $fallback | Out-Null
         return $fallback
     }
 }
+
 
 # Muestra la ayuda
 if ($Help) {
@@ -100,10 +101,12 @@ $COMPILED_AT = (Get-Date).ToUniversalTime().ToString("s") + "Z"
 $BUILD_MACHINE = $env:COMPUTERNAME
 
 # 6) Salida (dir/archivo)
+$defaultDir = (Get-Location).Path 
+
 if ([string]::IsNullOrWhiteSpace($OutDir)) {
-    $targetDir = Confirm-dir "build" "build"
+    $targetDir = Confirm-Dir $defaultDir $defaultDir
 } else {
-    $targetDir = Confirm-dir $OutDir "build"
+    $targetDir = Confirm-Dir $OutDir $defaultDir
 }
 
 if ([string]::IsNullOrWhiteSpace($OutFile)) {
